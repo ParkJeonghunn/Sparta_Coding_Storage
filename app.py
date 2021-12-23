@@ -8,35 +8,26 @@ db = client.dbsparta
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+   return render_template('index.html')
 
-@app.route("/bucket", methods=["POST"])
-def bucket_post():
-    bucket_receive = request.form['bucket_give']
-
-    bucket_list = list(db.bucket.find({}, {'_id': False}))
-    count = len(bucket_list) + 1
-
+@app.route("/mars", methods=["POST"])
+def web_mars_post():
+    name_receive = request.form['name_give']
+    address_receive = request.form['address_give']
+    size_receive = request.form['size_give']
     doc = {
-        'num':count,
-        'bucket':bucket_receive,
-        'done':0
+        'name' : name_receive,
+        'address' : address_receive,
+        'size' : size_receive
     }
+    db.mars.insert_one(doc)
 
-    db.bucket.insert_one(doc)
+    return jsonify({'msg': '주문 완료!'})
 
-    return jsonify({'msg': '등록 완료!'})
-
-@app.route("/bucket/done", methods=["POST"])
-def bucket_done():
-    num_receive = request.form['num_give']
-    db.bucket.update_one({'num': int(num_receive)}, {'$set': {'done': 1}})
-    return jsonify({'msg': '버킷 완료!'})
-
-@app.route("/bucket", methods=["GET"])
-def bucket_get():
-    bucket_list = list(db.bucket.find({}, {'_id': False}))
-    return jsonify({'buckets': bucket_list})
+@app.route("/mars", methods=["GET"])
+def web_mars_get():
+    order_list = list(db.mars.find({}, {'_id': False}))
+    return jsonify({'orders': order_list})
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', port=5000, debug=True)
+   app.run('0.0.0.0', port=5000, debug=True)
